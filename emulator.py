@@ -1,8 +1,17 @@
-registers = [0]
+from ast import unparse
+
+registers = [0, 6, 1, 5, 2, 2, 3]
+visible_registers = 20
 
 
+
+from prettytable import PrettyTable
+
+table = PrettyTable()
 commands = []
-registers += [0] * 1000
+registers += [0] * 100
+
+table.field_names = ["cmd"] + ['R' + str(num) for num in range(len(registers))]
 
 
 def j(q1: int, q2: int, to: int) -> int:
@@ -21,16 +30,20 @@ def s(a: int):
     registers[a] += 1
 
 def p():
-    print(registers)
+    print(registers[0])
 
 
 def parse() -> list:
     global commands
+
     with open("code.txt", 'r') as f:
-        commands = f.read().split('\n')
+        qrb = f.read().split('\n')
+
+    for i in qrb:
+        if '#' in i or i == '': continue
+        commands.append(i.split())
 
     for i in range(len(commands)):
-        commands[i] = commands[i].split(' ')
         for j in range(1, len(commands[i])):
             commands[i][j] = int(commands[i][j])
 
@@ -55,11 +68,12 @@ def emulation():
     global commands
 
     i = 0
+    cnt = 1
     while i < len(commands):
         command = commands[i]
         comm = command[0]
 
-        print(comm, registers)
+        print(f"{comm.upper()} on line {i} with {cnt} iter, ", registers[:visible_registers])
 
         if comm == 'p':
             p()
@@ -73,9 +87,12 @@ def emulation():
             out = j(command[1], command[2], command[3])
             if out != -1:
                 i = out
+                table.add_row([f"{cnt}: {comm.upper()} ({i})"] + registers, divider=True)
                 continue
-        i += 1
 
+        table.add_row([f"{cnt}: {comm.upper()} ({i})"] + registers, divider=False)
+        i += 1
+        cnt += 1
 
 def error_catch(number: int):
     print(f"error on line {number + 1}")
@@ -83,10 +100,13 @@ def error_catch(number: int):
 
 if __name__ == "__main__":
     commands = parse()
+    print(commands)
     status, num = check_health()
 
     if not status:
         error_catch(num)
 
-    # print(registers)
+
     emulation()
+    with open("output.txt", 'w') as f:
+        print(table, file=f)

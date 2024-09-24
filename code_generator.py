@@ -110,17 +110,28 @@ def square(ans, r, dop1, dop2, dop3):
     z(dop3)
 
 
-def write_code():
+def write_code(to_code=False):
     text = ""
     for i in commands:
         text += ' '.join(i) + "\n"
     print(text)
+    text.rstrip()
     with open("gen_code.txt", "w") as f:
         f.write(text)
+    if to_code:
+        with open("code.txt", "w") as f:
+            f.write(text)
 
 def code():
+    divide(7, 1, 5, 12, 13)
+    multiplied(8, 2, 5, 12, 13)
+    fact(9, 3, 12, 13, 14, 15)
+    exponentiation(10, 4, 6, 12, 13, 14, 15)
+    difference(11, 7, 8, 12)
+    summ(12, 11, 9, 13)
+    summ(0, 12, 10, 13)
     p()
 
 if __name__ == '__main__':
     code()
-    write_code()
+    write_code(True)
